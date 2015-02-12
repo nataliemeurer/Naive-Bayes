@@ -49,6 +49,7 @@ def readArff(fileSrc):
 				continue
 		else:
 			line = line.replace(" ", "");
+			line = line.replace("\n", "");
 			line = line.split(",");
 			newDataEntry = {}							# create a new object to store our row data
 			for idx, value in enumerate(line):			# for every column of data
@@ -83,7 +84,7 @@ def readArff(fileSrc):
 	results['lookup'] = reverseLookup
 	results['continuousVariables'] = continuousVariables
 	results['categoricalVariables'] = categoricalVariables
-	print results['lookup']['age 39']
+	print results['categoricalVariables']['race:'].getMode()
 	return results
 
 
@@ -93,29 +94,37 @@ class continuousBin:
 	def __init__(self, attrName, value1):
 		self.values = [value1]
 		self.attrName = attrName
+		self.mean = value1
 
 	def add(self, val):
+		self.mean = ((self.mean * len(self.values)) + val) / (len(self.values) + 1)
 		bisect.insort(self.values, val)
 
 	def getValues(self):
 		return self.values
+
+	def getMean():
+		return mean
 
 	def getAttrName(self):
 		return self.attrName
 
 # Class used to manage sets of a categorical variable
 class categoricalBin:
-	def __init__(self, attrName, value1):
-		self.values = [value1]
-		self.attrName = attrName
+	def __init__(self, types, value1):
+		self.categories = {}
+		for type in types:
+			self.categories[type] = 0
+		self.categories['?'] = 0
+		self.categories[str(value1)] += 1
+		self.mode = [1, value1];
 
 	def add(self, val):
-		bisect.insort(self.values, val)
+		self.categories[val] += 1
+		if self.categories[val] > self.mode[0]:
+			self.mode = [self.categories[val], val]
 
-	def getValues(self):
-		return self.values
-
-	def getAttrName(self):
-		return self.attrName
+	def getMode(self):
+		return self.mode[1]
 
 readArff(src)
