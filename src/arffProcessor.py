@@ -1,5 +1,4 @@
 import codecs
-import arff
 import re
 import bisect
 
