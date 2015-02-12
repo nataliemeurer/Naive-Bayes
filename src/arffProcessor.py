@@ -29,12 +29,12 @@ def readArff(fileSrc):
 			continue
 		elif line[0] == '@':					# if is metadata
 			if '@relation' in line:				# if relation
-				arrayLine = line.split(" ");
+				arrayLine = line.split(" ")
 				relation = arrayLine[1]
 				print relation
 			elif "@attribute" in line:			# if attribute
-				arrayLine = line.split(" ");
-				attributes.append([arrayLine[1]]);
+				arrayLine = line.split(" ")
+				attributes.append([arrayLine[1]])
 				if "real" not in arrayLine[2]:	# if attribute is not real (is categorical)
 					attrs = re.search('\{(.*?)\}', line).group()	# select text between brackets
 					attrs = re.sub('[\{\}]', "", attrs)				# remove brackets
@@ -48,9 +48,9 @@ def readArff(fileSrc):
 		elif line[0] == " ":
 				continue
 		else:
-			line = line.replace(" ", "");
-			line = line.replace("\n", "");
-			line = line.split(",");
+			line = line.replace(" ", "")
+			line = line.replace("\n", "")
+			line = line.split(",")
 			newDataEntry = {}							# create a new object to store our row data
 			for idx, value in enumerate(line):			# for every column of data
 				attribute = attributes[idx]
