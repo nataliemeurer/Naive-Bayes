@@ -37,9 +37,9 @@ def readArff(fileSrc):
 				arrayLine = line.split(" ");
 				attributes.append([arrayLine[1]]);
 				if "real" not in arrayLine[2]:	# if attribute is not real (is categorical)
-					attrs = re.search('\{(.*?)\}', line).group()
-					attrs = re.sub('[\{\}]', "", attrs)
-					newAttrs = attrs.split(", ")
+					attrs = re.search('\{(.*?)\}', line).group()	# select text between brackets
+					attrs = re.sub('[\{\}]', "", attrs)				# remove brackets
+					newAttrs = attrs.split(", ")					
 					options = []
 					for attr in newAttrs:
 						options.append(attr)
@@ -88,27 +88,6 @@ def readArff(fileSrc):
 	return results
 
 
-
-	# data = arff.load(dataFile)						# load all data from the arff					
-	# attributes = data['attributes']					# put attributes in other variable for easy access
-	# rows = data['data']								# store data in rows variable
-	rowData = []									# create variable to store row data as a list of dictionaries
-
-	# for rowIdx, row in enumerate(rows): 			# for each row of data
-	# 	rowData.append({})
-	# 	for entryIdx, entry in enumerate(row):
-	# 		rowData[rowIdx][attributes[entryIdx][0]] = entry	# set main data value
-	# 		if attributes[entryIdx][1] == 'REAL': 				# if we're dealing with a continuous variable, we will store it in its own list
-	# 			if attributes[entryIdx][0] in continuousVariables:
-	# 				continuousVariables[attributes[entryIdx][0]].add(entry)
-	# 			else:
-	# 				continuousVariables[attributes[entryIdx][0]] = continuousBin(attributes[entryIdx][0], entry)
-	# 		else:
-	# 			if (attributes[entryIdx][0] + " " + str(row[entryIdx])) in reverseLookup:	# if key already taken
-	# 				reverseLookup[attributes[entryIdx][0] + " " + str(row[entryIdx])].append(rowIdx)	# add to list of reverse lookups under the key 'attributeKey attributeValue'
-	# 			else:
-	# 				reverseLookup[attributes[entryIdx][0] + " " + str(row[entryIdx])] = [rowIdx]  # if it's not continuous, we create the key with the row index stored in it
-	# print continuousVariables['age'].getValues()
 
 # Class used to manage sorted sets of a continuous variable
 class continuousBin:
