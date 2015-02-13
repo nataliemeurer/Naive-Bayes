@@ -1,15 +1,6 @@
 import codecs
 import re
-import bisect
-
-src = '../data/adult-big.arff'
-
-def isNumber(str):
-    try:
-        float(str)
-        return True
-    except ValueError:
-        return False
+import utils as util
 
 # readArff( fileSrc ): takes a file path for an arff and returns a list of dictionaries as well as a d
 def readArff(fileSrc):
@@ -21,21 +12,22 @@ def readArff(fileSrc):
 	continuousVariables = {}
 	categoricalVariables = {}
 	dataFile = codecs.open(fileSrc, 'rb', 'utf-8') 	# specify utf-8 encoding
-	print "Beginning file reading"
-	lines = dataFile.readlines() 				# read all lines
+	print "Reading file..."
+	lines = dataFile.readlines() 					# read all lines
+	util.updateProgress(0)					# create a progress bar
 	# test every line and extract its relevant information
-	for line in lines:							# test each line
-		if line[0] == '%':						# ignore comments
+	for idx, line in enumerate(lines):				# test each line
+		util.updateProgress(float(idx) / float(len(lines)))
+		if line[0] == '%':							# ignore comments
 			continue
-		elif line[0] == '@':					# if is metadata
-			if '@relation' in line:				# if relation
+		elif line[0] == '@':						# if is metadata
+			if '@relation' in line:					# if relation
 				arrayLine = line.split(" ")
 				relation = arrayLine[1]
-				print relation
-			elif "@attribute" in line:			# if attribute
+			elif "@attribute" in line:				# if attribute
 				arrayLine = line.split(" ")
 				attributes.append([arrayLine[1]])
-				if "real" not in arrayLine[2]:	# if attribute is not real (is categorical)
+				if "real" not in arrayLine[2]:		# if attribute is not real (is categorical)
 					attrs = re.search('\{(.*?)\}', line).group()	# select text between brackets
 					attrs = re.sub('[\{\}]', "", attrs)				# remove brackets
 					newAttrs = attrs.split(", ")					
@@ -60,7 +52,7 @@ def readArff(fileSrc):
 					reverseLookup[rlKey].append(len(rawData)) # append index of our current row (the length of data) for quick lookup later
 				else:
 					reverseLookup[rlKey] = [len(rawData)]	# create a new arrayList to store our indices if one does not already exist
-				if isNumber(value):						# convert string to float if it's a number
+				if util.isNumber(value):						# convert string to float if it's a number
 					value = float(value)
 				# fill our newData Entry
 				newDataEntry[attribute[0]] = value 		# store the value under its proper key
@@ -69,12 +61,12 @@ def readArff(fileSrc):
 					if attribute[0] in continuousVariables:
 						continuousVariables[attribute[0]].add(value)							# add our value to our continuous bin
 					else:
-						continuousVariables[attribute[0]] = continuousBin(attribute[0], value)	# instantiate a continuous bin to hold our variable
+						continuousVariables[attribute[0]] = util.continuousBin(attribute[0], value)	# instantiate a continuous bin to hold our variable
 				else:									# if the attribute is categorical, we place it in a categorical bin
 					if attribute[0] in categoricalVariables:
 						categoricalVariables[attribute[0]].add(value)
 					else:
-						categoricalVariables[attribute[0]] = categoricalBin(attribute[1], value)
+						categoricalVariables[attribute[0]] = util.categoricalBin(attribute[1], value)
 			rawData.append(newDataEntry)					# append data entry to all of our data
 	# END OF FOR LOOP
 	results = {}
@@ -84,47 +76,5 @@ def readArff(fileSrc):
 	results['lookup'] = reverseLookup
 	results['continuousVariables'] = continuousVariables
 	results['categoricalVariables'] = categoricalVariables
-	print results['categoricalVariables']['race:'].getMode()
+	print "\nFile read complete"
 	return results
-
-
-
-# Class used to manage sorted sets of a continuous variable
-class continuousBin:
-	def __init__(self, attrName, value1):
-		self.values = [value1]
-		self.attrName = attrName
-		self.mean = value1
-
-	def add(self, val):
-		self.mean = ((self.mean * len(self.values)) + val) / (len(self.values) + 1)
-		bisect.insort(self.values, val)
-
-	def getValues(self):
-		return self.values
-
-	def getMean():
-		return mean
-
-	def getAttrName(self):
-		return self.attrName
-
-# Class used to manage sets of a categorical variable
-class categoricalBin:
-	def __init__(self, types, value1):
-		self.categories = {}
-		for type in types:
-			self.categories[type] = 0
-		self.categories['?'] = 0
-		self.categories[str(value1)] += 1
-		self.mode = [1, value1];
-
-	def add(self, val):
-		self.categories[val] += 1
-		if self.categories[val] > self.mode[0]:
-			self.mode = [self.categories[val], val]
-
-	def getMode(self):
-		return self.mode[1]
-
-readArff(src)
