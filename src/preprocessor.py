@@ -1,6 +1,8 @@
 import utils as util
 import numpy as np
 import settings
+import bisect
+import Queue
 
 # dataBin class manages and preprocesses all of our data
 class dataBin:
@@ -75,7 +77,10 @@ class dataBin:
 
 	def entropyDiscretize(self, attrName, maxNumOfBins=10):
 		# declare variables
-		numOfBins = 1
+		class Helper:	# helper class preserves access to outer scoped 
+			binCount = 1
+
+		helper = Helper()
 		splits = []
 		data = []
 		# create supplementary data structure to store relevant data as tuples [attr, classifier]
@@ -88,7 +93,9 @@ class dataBin:
 					data.append((contVar, self.data[userId][settings.CLASSIFIER_NAME]))
 		# Use a closure scoped function to do the heavy lifting, assume items in bin(list) are tuples
 		def findMaxEntropySplit(bin):
-			maxEntropyGain = [0, 0]  # split value, entropy gain value
+			# if helper.binCount >= maxNumOfBins:
+			# 	return
+			maxEntropyGain = [0, 0, 0]  # split value, entropy gain value
 			belowCount = 0
 			aboveCount = 0
 			initialEntropy = 1
@@ -108,7 +115,7 @@ class dataBin:
 				# fast forward our for loop until we hit the max index
 				if idx < jumpToIdx or idx + 1 == len(bin) - 1:
 					continue
-				
+	
 				jumpToIdx = idx
 				while idx + 1 < len(bin) - 1 and bin[idx][0] == bin[idx + 1][0]:  # while we haven't reached the end and we have unequal values
 					idx += 1
@@ -127,8 +134,19 @@ class dataBin:
 				if entropyGain > maxEntropyGain[1]:
 					maxEntropyGain[0] = splitPoint
 					maxEntropyGain[1] = entropyGain
+					maxEntropyGain[2] = jumpToIdx
 			print maxEntropyGain
+			bisect.insort(splits, maxEntropyGain[0])
+			return [bin[0:maxEntropyGain[2]], bin[maxEntropyGain[2]:]
+			# helper.binCount += 1
+			# findMaxEntropySplit(bin[maxEntropyGain[2]:])
+			# findMaxEntropySplit(bin[0:maxEntropyGain[2]])
 		findMaxEntropySplit(data)
+
+		q = Queue.Queue();
+		q.put(data)
+		while q.qsize() and 
+
 
 	def calculateEntropyGain(self, initialEntropy, count1a, count1b, count2a, count2b):
 		binSize1 = float(count1a + count1b)
@@ -137,7 +155,6 @@ class dataBin:
 		bin1Entropy = self.calculateEntropy(float(count1a) / binSize1) + self.calculateEntropy(float(count1b) / binSize1)
 		bin2Entropy = self.calculateEntropy(float(count2a) / binSize2) + self.calculateEntropy(float(count2b) / binSize2)
 		entropyGain = initialEntropy - (binSize1 / totalSize)*( bin1Entropy ) - (binSize2 / totalSize)*( bin2Entropy )
-		print entropyGain
 		return entropyGain
 
 	def calculateEntropy(self, prob):
