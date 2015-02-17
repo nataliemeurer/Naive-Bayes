@@ -10,8 +10,9 @@ class continuousBin:
 		self.mean = value1
 
 	def add(self, val):
-		self.mean = ((self.mean * len(self.values)) + val) / (len(self.values) + 1)
-		bisect.insort(self.values, val)
+		if isNumber(val):
+			self.mean = ((self.mean * len(self.values)) + val) / (len(self.values) + 1)
+			bisect.insort(self.values, val)
 
 	def getValues(self):
 		return self.values
@@ -59,11 +60,11 @@ def updateProgress(progress):
         status = "error: progress var must be float\r\n"
     if progress < 0:
         progress = 0
-        status = "Halt...\r\n"
+        status = "Pausing...\r\n"
     if progress >= 1:
         progress = 1
-        status = "Done...\r\n"
+        status = "Processing complete..."
     block = int(round(barLength*progress))
-    text = "\rPercent: [{0}] {1}% {2}".format( "#"*block + "-"*(barLength-block), progress*100, status)
+    text = "\rProgress: [{0}] {1}% {2}".format( "#" * block + "-" * (barLength - block), progress * 100, status)
     sys.stdout.write(text)
     sys.stdout.flush()

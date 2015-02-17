@@ -76,5 +76,6 @@ def readArff(fileSrc):
 	results['lookup'] = reverseLookup
 	results['continuousVariables'] = continuousVariables
 	results['categoricalVariables'] = categoricalVariables
+	util.updateProgress(1)
 	print "\nFile read complete"
 	return results
