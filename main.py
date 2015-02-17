@@ -9,4 +9,4 @@ import settings as ENV
 data = arff.readArff(ENV.DATA_SRC)
 fullData = processor.dataBin(data)
 fullData.fillAllMissingValues()
-fullData.entropyDiscretize("age")
+fullData.entropyDiscretize("capital-gain:")

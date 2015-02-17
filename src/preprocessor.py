@@ -2,7 +2,7 @@ import utils as util
 import numpy as np
 import settings
 import bisect
-import Queue
+import Queue as qu
 
 # dataBin class manages and preprocesses all of our data
 class dataBin:
@@ -17,6 +17,10 @@ class dataBin:
 	
 	def getData(self):
 		return self.data
+
+	# Discretize all continuous variables
+	def discretizeAllContinuousVariables(self):
+		return 1
 
 	# fills all missing values using the mean or mode of the class
 	def fillAllMissingValues(self):
@@ -75,11 +79,10 @@ class dataBin:
 		else:
 			print "No attribute found for " + attrName
 
-	def entropyDiscretize(self, attrName, maxNumOfBins=10):
+	def entropyDiscretize(self, attrName, maxNumOfBins=5):
 		# declare variables
-		class Helper:	# helper class preserves access to outer scoped 
-			binCount = 1
-
+		class Helper:
+			binCount = 0
 		helper = Helper()
 		splits = []
 		data = []
@@ -93,8 +96,6 @@ class dataBin:
 					data.append((contVar, self.data[userId][settings.CLASSIFIER_NAME]))
 		# Use a closure scoped function to do the heavy lifting, assume items in bin(list) are tuples
 		def findMaxEntropySplit(bin):
-			# if helper.binCount >= maxNumOfBins:
-			# 	return
 			maxEntropyGain = [0, 0, 0]  # split value, entropy gain value
 			belowCount = 0
 			aboveCount = 0
@@ -106,7 +107,6 @@ class dataBin:
 					belowCount += 1
 			if len(bin) > 0:
 				initialEntropy = self.calculateEntropy(float(aboveCount) / float(len(bin))) + self.calculateEntropy(float(belowCount) / float(len(bin)))
-				# print initialEntropy
 			countHisto = [[0, 0], [belowCount, aboveCount]] # in the format [countA <=50, countA >50][countB <=50, countB >50].  This will be updated as we move through the bin
 			splitPoint = bin[0][0] - .01		
 			jumpToIdx = 0  					# used to save time when we've already tested 
@@ -136,27 +136,61 @@ class dataBin:
 					maxEntropyGain[1] = entropyGain
 					maxEntropyGain[2] = jumpToIdx
 			print maxEntropyGain
-			bisect.insort(splits, maxEntropyGain[0])
-			return [bin[0:maxEntropyGain[2]], bin[maxEntropyGain[2]:]
-			# helper.binCount += 1
-			# findMaxEntropySplit(bin[maxEntropyGain[2]:])
-			# findMaxEntropySplit(bin[0:maxEntropyGain[2]])
-		findMaxEntropySplit(data)
+			if maxEntropyGain[0] > 0:
+				bisect.insort(splits, maxEntropyGain[0])
+				helper.binCount += 1
+				return [bin[0:maxEntropyGain[2]], bin[maxEntropyGain[2]:]]
+			else:
+				return False
 
-		q = Queue.Queue();
+		q = qu.Queue()
 		q.put(data)
-		while q.qsize() and 
+		while q.qsize() and helper.binCount < maxNumOfBins:
+			currentBin = q.get()
+			newBins = findMaxEntropySplit(currentBin)
+			if newBins != False:
+				q.put(newBins[1])
+				q.put(newBins[0])
+		print splits
 
+	# Returns true if a given entropy gain passes a threshold determined by the Minimum Description Length principle.  This function is called when entropy gain is calculated
+	# Idea taken from here: http://clear-lines.com/blog/post/Discretizing-a-continuous-variable-using-Entropy.aspx
+	def validateEntropyGain(self, gain, binSize, numOfClassesOverall, numOfClassesGroup1, numOfClassesGroup2, initialEntropy, entropyGroup1, entropyGroup2):
+		qualifier = (( 1 / binSize ) * np.log2(binSize - 1)) + ( 1 / binSize )  * ( np.log2(3 * numOfClassesOverall - 2) - ( numOfClassesOverall * initialEntropy - numOfClassesGroup1 * entropyGroup1 - numOfClassesGroup2 * entropyGroup2) )     
+		if gain >= qualifier:
+			return True
+		else:
+			return False
 
 	def calculateEntropyGain(self, initialEntropy, count1a, count1b, count2a, count2b):
 		binSize1 = float(count1a + count1b)
 		binSize2 = float(count2a + count2b)
+		classCountGroup1 = 2
+		classCountGroup2 = 2
+		# count numOfClasses in group 1
+		if count1a == 0 or count1b == 0:
+			if count1a == 0 and count1b == 0:
+				classCountGroup1 = 0
+			else:
+				classCountGroup1 = 1
+		# count numOfClasses in group 2
+		if count2a == 0 or count2b == 0:
+			if count2a == 0 and count2b == 0:
+				classCountGroup2 = 0
+			else:
+				classCountGroup2 = 1
+		if binSize1 == 0 or binSize2 == 0:
+			return 0
 		totalSize = binSize1 + binSize2
 		bin1Entropy = self.calculateEntropy(float(count1a) / binSize1) + self.calculateEntropy(float(count1b) / binSize1)
 		bin2Entropy = self.calculateEntropy(float(count2a) / binSize2) + self.calculateEntropy(float(count2b) / binSize2)
 		entropyGain = initialEntropy - (binSize1 / totalSize)*( bin1Entropy ) - (binSize2 / totalSize)*( bin2Entropy )
-		return entropyGain
+		if self.validateEntropyGain(entropyGain, totalSize, 2, classCountGroup1, classCountGroup2, initialEntropy, bin1Entropy, bin2Entropy):
+			return entropyGain
+		else:
+			return 0
 
 	def calculateEntropy(self, prob):
-		return -1 * prob * np.log2(prob)
+		result = -1 * prob * np.log2(prob)
+		return result
 
