@@ -4,7 +4,7 @@
 DATA_SRC = './data/adult-big.arff'
 
 # Naive Bayes Preferences
-
+CLASSIFIER_NAME = "class"
 
 
 # Validator Preferences

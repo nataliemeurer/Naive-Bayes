@@ -1,4 +1,6 @@
 import utils as util
+import numpy as np
+import settings
 
 # dataBin class manages and preprocesses all of our data
 class dataBin:
@@ -70,3 +72,39 @@ class dataBin:
 				print "No missing values for " + attrName
 		else:
 			print "No attribute found for " + attrName
+
+	def entropyDiscretize(self, attrName, maxNumOfBins=10):
+		# declare variables
+		numOfBins = 1
+		splits = []
+		data = []
+		# create supplementary data structure to store relevant data as tuples [attr, classifier]
+		for contVar in self.continuousVariables[attrName].getValues():	# for every continuous variable we have
+			if len(data) == 0:
+				for userId in self.lookup[attrName + " " + str(int(contVar))]:		# for every user that has that continuous variable value
+					data.append([contVar, self.data[userId][settings.CLASSIFIER_NAME]])
+			elif data[len(data)-1][0] != contVar:							# if we have not already allocated the users for this continuous var
+				for userId in self.lookup[attrName + " " + str(int(contVar))]:		# for every user that has that continuous variable value
+					data.append([contVar, self.data[userId][settings.CLASSIFIER_NAME]])
+		# Use a closure scoped function to do the heavy lifting, assume items in bin(list) are dictionaries
+		def findMaxEntropySplit(bin):
+			maxEntropyGain = 0
+			belowCount = 0
+			aboveCount = 0
+			for item in bin:
+				if item[1] == ">50K":
+					aboveCount += 1
+				else:
+					belowCount += 1
+			if len(bin) > 0:
+				initialEntropy = self.calculateEntropy(float(aboveCount) / float(len(bin))) + self.calculateEntropy(float(belowCount) / float(len(bin)))
+				print initialEntropy
+			countHist = numpy.matrix([0, 0], [belowCount, aboveCount])
+			for
+
+
+		findMaxEntropySplit(data)
+
+	def calculateEntropy(self, prob):
+		return -1 * prob * np.log2(prob)
+
