@@ -40,7 +40,7 @@ class dataBin:
 					self.categoricalVariables[attrName].add(mode)
 				# move indices into proper location ['attr modeName']
 				for filledUserID in self.lookup[attrName + " ?"]:
-					self.lookup[attrName + " " + mode]
+					self.lookup[attrName + " " + mode].append(filledUserID)
 				self.lookup.pop(attrName + " ?", 0) 		# remove from reverse lookup
 			else:
 				print "No missing values for " + attrName
@@ -61,7 +61,10 @@ class dataBin:
 					self.continuousVariables[attrName].add(mean)
 				# move indices into proper location ['attr modeName']
 				for filledUserID in self.lookup[attrName + " ?"]:
-					self.lookup[attrName + " " + mean]
+					if attrName + " " + str(mean) in self.lookup:
+						self.lookup[attrName + " " + str(mean)].append(filledUserID)
+					else:
+						self.lookup[attrName + " " + str(mean)] = [filledUserID]
 				self.lookup.pop(attrName + " ?", 0) 		# remove from reverse lookup
 			else:
 				print "No missing values for " + attrName

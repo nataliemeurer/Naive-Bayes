@@ -17,8 +17,8 @@ class continuousBin:
 	def getValues(self):
 		return self.values
 
-	def getMean():
-		return mean
+	def getMean(self):
+		return self.mean
 
 	def getAttrName(self):
 		return self.attrName
