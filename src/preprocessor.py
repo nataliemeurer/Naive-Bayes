@@ -15,19 +15,76 @@ class dataBin:
 		self.categoricalVariables = data['categoricalVariables']
 		self.relation = data['relation']
 	
+	# return the primary data
 	def getData(self):
 		return self.data
 
 	# Discretize all continuous variables
 	def discretizeAllContinuousVariables(self):
-		return 1
+		print "Discretizing all continuous variables"
+		continuousVars = self.continuousVariables.keys()
+		for idx, attrName in enumerate(continuousVars):
+			print "Discretizing data for " + attrName
+			splits = self.entropyDiscretize(attrName, settings.NUM_OF_BINS)
+			if len(splits) > 0:
+				print "Splitting " + attrName + " at the following values:"
+				print splits
+				print "\n"
+				self.convertContinuousToCategorical(attrName, splits)
+			else:
+				print "Not enough entropy gain to split " + attrName + "\n"
+
+	# Converts continuous data into a categorical format based on specified splits
+	def convertContinuousToCategorical(self, attrName, splits):
+		data = []
+		currentSplit = [splits[0], 0] 	# split number, index
+		splitTypes = []
+		for split in splits:	# for every split, save a splitKey
+			if split != splits[len(splits) - 1]:
+				splitTypes.append("<=" + str(split))
+		newBin = util.categoricalBin(splitTypes)
+		for contVar in self.continuousVariables[attrName].getValues():	# for every continuous variable we have
+			if contVar > currentSplit and currentSplit[1] != len(splits) - 1:
+				currentSplit = [splits[currentSplit[1] + 1], currentSplit[1] + 1]
+				splitKey = "<=" + str(currentSplit[0])
+			elif contVar > currentSplit:
+				splitKey = ">" + str(currentSplit[0])
+			else:
+				splitKey = "<=" + str(currentSplit[0])
+			
+			if len(data) == 0:
+				rlKey = attrName + " " + str(int(contVar))
+				newrlKey = attrName + " " + splitKey
+				if rlKey in self.lookup:
+					for userId in self.lookup[rlKey]:		# for every user that has that continuous variable value
+						self.data[userId][attrName] = splitKey
+						if newrlKey in self.lookup:
+							self.lookup[newrlKey].append(userId)
+						else:
+							self.lookup[newrlKey] = [userId]
+						newBin.add(splitKey)
+					self.lookup.pop(rlKey)
+
+			elif data[len(data)-1][0] != contVar:							# if we have not already allocated the users for this continuous var
+				rlKey = attrName + " " + str(int(contVar))
+				newrlKey = attrName + " " + splitKey
+				for userId in self.lookup[rlKey]:		# for every user that has that continuous variable value
+					self.data[userId][attrName] = splitKey
+					if newrlKey in self.lookup:
+						self.lookup[newrlKey].append(userId)
+					else:
+						self.lookup[newrlKey] = [userId]
+					newBin.add(splitKey)
+				self.lookup.pop(rlKey)
+		self.continuousVariables.pop(attrName)
+		self.categoricalVariables[attrName] = newBin
 
 	# fills all missing values using the mean or mode of the class
 	def fillAllMissingValues(self):
+		print "Filling all missing values with mean(continuous) or mode(categorical)"
 		# for each attribute
 		for attr in self.attributes:
 			if attr[0] + " ?" in self.lookup:	# If we have undefined variables
-				print attr[0]
 				if attr[1] == 'real':
 					self.fillMissingContinuousValues(attr[0])
 				else:
@@ -79,6 +136,7 @@ class dataBin:
 		else:
 			print "No attribute found for " + attrName
 
+	# Performs entropy-based discretization on a continuous attribute and returns a sorted array of splits
 	def entropyDiscretize(self, attrName, maxNumOfBins=5):
 		# declare variables
 		class Helper:
@@ -135,7 +193,6 @@ class dataBin:
 					maxEntropyGain[0] = splitPoint
 					maxEntropyGain[1] = entropyGain
 					maxEntropyGain[2] = jumpToIdx
-			print maxEntropyGain
 			if maxEntropyGain[0] > 0:
 				bisect.insort(splits, maxEntropyGain[0])
 				helper.binCount += 1
@@ -143,15 +200,17 @@ class dataBin:
 			else:
 				return False
 
-		q = qu.Queue()
+		# MAIN FUNCTION LOGIC
+		q = qu.Queue()	# instantiate a queue to facilitate our breadth-first approach
 		q.put(data)
+		# while there are still things in the queue and we haven't exceeded our max
 		while q.qsize() and helper.binCount < maxNumOfBins:
 			currentBin = q.get()
 			newBins = findMaxEntropySplit(currentBin)
 			if newBins != False:
 				q.put(newBins[1])
 				q.put(newBins[0])
-		print splits
+		return splits
 
 	# Returns true if a given entropy gain passes a threshold determined by the Minimum Description Length principle.  This function is called when entropy gain is calculated
 	# Idea taken from here: http://clear-lines.com/blog/post/Discretizing-a-continuous-variable-using-Entropy.aspx

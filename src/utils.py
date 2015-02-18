@@ -25,13 +25,14 @@ class continuousBin:
 
 # Class used to manage sets of a categorical variable
 class categoricalBin:
-	def __init__(self, types, value1):
+	def __init__(self, types, value1="?"):
 		self.categories = {}
 		for type in types:
 			self.categories[type] = 0
 		self.categories['?'] = 0
 		self.categories[str(value1)] += 1
-		self.mode = [1, value1];
+		self.mode = [1, value1]
+
 
 	def add(self, val):
 		self.categories[val] += 1

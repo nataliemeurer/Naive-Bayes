@@ -77,5 +77,5 @@ def readArff(fileSrc):
 	results['continuousVariables'] = continuousVariables
 	results['categoricalVariables'] = categoricalVariables
 	util.updateProgress(1)
-	print "\nFile read complete"
+	print "\nFile read complete \n"
 	return results

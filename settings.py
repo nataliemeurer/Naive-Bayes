@@ -4,7 +4,7 @@
 DATA_SRC = './data/adult-big.arff'
 
 # Preprocessor Preferences
-NUM_OF_BINS = 10
+NUM_OF_BINS = 5
 
 # Naive Bayes Preferences
 CLASSIFIER_NAME = "class"
