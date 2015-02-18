@@ -59,14 +59,16 @@ def readArff(fileSrc):
 				# add variables to our bins
 				if attribute[1] == 'real':  				# if the attribute is real, we place it in a continuous bin
 					if attribute[0] in continuousVariables:
-						continuousVariables[attribute[0]].add(value)							# add our value to our continuous bin
+						continuousVariables[attribute[0]].add(value, line[len(line) - 1])							# add our value to our continuous bin
 					else:
-						continuousVariables[attribute[0]] = util.continuousBin(attribute[0], value)	# instantiate a continuous bin to hold our variable
+						continuousVariables[attribute[0]] = util.continuousBin(attribute[0])	# instantiate a continuous bin to hold our variable
+						continuousVariables[attribute[0]].add(value, line[len(line) - 1])
 				else:									# if the attribute is categorical, we place it in a categorical bin
 					if attribute[0] in categoricalVariables:
-						categoricalVariables[attribute[0]].add(value)
+						categoricalVariables[attribute[0]].add(value, line[len(line) - 1])
 					else:
-						categoricalVariables[attribute[0]] = util.categoricalBin(attribute[1], value)
+						categoricalVariables[attribute[0]] = util.categoricalBin(attribute[1])
+						categoricalVariables[attribute[0]].add(value, line[len(line) - 1])
 			rawData.append(newDataEntry)					# append data entry to all of our data
 	# END OF FOR LOOP
 	results = {}

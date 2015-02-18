@@ -42,6 +42,9 @@ class dataBin:
 		for split in splits:	# for every split, save a splitKey
 			if split != splits[len(splits) - 1]:
 				splitTypes.append("<=" + str(split))
+		for attr in self.attributes:
+			if attr[0] == attrName:
+				attr[1] = splitTypes
 		newBin = util.categoricalBin(splitTypes)
 		for contVar in self.continuousVariables[attrName].getValues():	# for every continuous variable we have
 			if contVar > currentSplit and currentSplit[1] != len(splits) - 1:
@@ -62,7 +65,7 @@ class dataBin:
 							self.lookup[newrlKey].append(userId)
 						else:
 							self.lookup[newrlKey] = [userId]
-						newBin.add(splitKey)
+						newBin.add(splitKey, self.data[userId][settings.CLASSIFIER_NAME])
 					self.lookup.pop(rlKey)
 
 			elif data[len(data)-1][0] != contVar:							# if we have not already allocated the users for this continuous var
@@ -95,16 +98,17 @@ class dataBin:
 	def fillMissingCategoricalValues(self, attrName):
 		if attrName in self.categoricalVariables:
 			# get and store the mode of that attribute
-			mode = self.categoricalVariables[attrName].getMode()
 			if (attrName + " ?") in self.lookup:
 				# reverseLookup the indices of people who are missing values and iterate through them
 				for entry in self.lookup[attrName + " ?"]:
+					mode = self.categoricalVariables[attrName].getClassMode(self.data[entry][settings.CLASSIFIER_NAME])
 					# replace their question mark with the mode
 					self.data[entry][attrName] = mode
 					# add to the mode in the categorical variables
-					self.categoricalVariables[attrName].add(mode)
+					self.categoricalVariables[attrName].add(mode, self.data[entry][settings.CLASSIFIER_NAME])
 				# move indices into proper location ['attr modeName']
 				for filledUserID in self.lookup[attrName + " ?"]:
+					mode = self.categoricalVariables[attrName].getClassMode(self.data[filledUserID][settings.CLASSIFIER_NAME])
 					self.lookup[attrName + " " + mode].append(filledUserID)
 				self.lookup.pop(attrName + " ?", 0) 		# remove from reverse lookup
 			else:
@@ -116,16 +120,17 @@ class dataBin:
 	def fillMissingContinuousValues(self, attrName):
 		if attrName in self.continuousVariables:
 			# get and store the mean of that attribute
-			mean = self.continuousVariables[attrName].getMean()
 			if (attrName + " ?") in self.lookup:
 				# reverseLookup the indices of people who are missing values and iterate through them
 				for entry in self.lookup[attrName + " ?"]:
+					mean = self.continuousVariables[attrName].getClassMean(self.data[entry][settings.CLASSIFIER_NAME])
 					# replace their question mark with the mean
 					self.data[entry][attrName] = mean
 					# add to the mean in the continuous variables
-					self.continuousVariables[attrName].add(mean)
+					self.continuousVariables[attrName].add(mean, self.data[entry][settings.CLASSIFIER_NAME])
 				# move indices into proper location ['attr modeName']
 				for filledUserID in self.lookup[attrName + " ?"]:
+					mean = self.continuousVariables[attrName].getClassMean(self.data[filledUserID][settings.CLASSIFIER_NAME])
 					if attrName + " " + str(mean) in self.lookup:
 						self.lookup[attrName + " " + str(mean)].append(filledUserID)
 					else:
