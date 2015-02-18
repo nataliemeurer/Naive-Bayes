@@ -244,10 +244,13 @@ class dataBin:
 		bin1Entropy = self.calculateEntropy(float(count1a) / binSize1) + self.calculateEntropy(float(count1b) / binSize1)
 		bin2Entropy = self.calculateEntropy(float(count2a) / binSize2) + self.calculateEntropy(float(count2b) / binSize2)
 		entropyGain = initialEntropy - (binSize1 / totalSize)*( bin1Entropy ) - (binSize2 / totalSize)*( bin2Entropy )
-		if self.validateEntropyGain(entropyGain, totalSize, 2, classCountGroup1, classCountGroup2, initialEntropy, bin1Entropy, bin2Entropy):
-			return entropyGain
+		if settings.MINIMUM_DESCRIPTION_LENGTH_VALIDATION == True:
+			if self.validateEntropyGain(entropyGain, totalSize, 2, classCountGroup1, classCountGroup2, initialEntropy, bin1Entropy, bin2Entropy):
+				return entropyGain
+			else:
+				return 0
 		else:
-			return 0
+			return entropyGain
 
 	def calculateEntropy(self, prob):
 		result = -1 * prob * np.log2(prob)
