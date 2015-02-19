@@ -37,6 +37,26 @@ class NaiveBayes:
 							self.categoricalCounts[newKey] = 1.0
 			for countKey in self.categoricalCounts:
 				if (" given " + key) in countKey:		# add to countKey our conditional probabilities
-					self.probability[countKey] = float(self.categoricalCounts[countKey]) / float(len(self.classifierBins[key]))
-		print self.probability
+					self.probability[countKey] = float(self.categoricalCounts[countKey]) / float(len(self.classifierBins[key])) # Assign conditional probabilities
+
+	def classify(self, data):
+		classProbabilities = {}
+		for className in self.classifierBins:
+			probabilityProd = None
+			# Calculate product of our probabilities
+			for key in data:
+				probKey = str(data[key]) + " given " + className
+				if probabilityProd == None:
+					probabilityProd = self.probability[probKey]
+				else:
+					probabilityProd *= self.probability[probKey]
+			classProbabilities[className] = probabilityProd * self.probability[className]
+		maxProb = [0, None]
+		for className in classProbabilities:
+			if classProbabilities[className] > maxProb[0]:
+				maxProb = [classProbabilities[className], className]
+		return maxProb[1]		# return the class with the highest probability
+
+
+
 
