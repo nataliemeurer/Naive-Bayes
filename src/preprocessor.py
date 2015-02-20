@@ -39,46 +39,38 @@ class dataBin:
 		data = []
 		currentSplit = [splits[0], 0] 	# split number, index
 		splitTypes = []
-		for split in splits:	# for every split, save a splitKey
-			if split != splits[len(splits) - 1]:
-				splitTypes.append("<=" + str(split))
+		# CREATE A LIST OF SPLIT TYPES
+		for idx, split in enumerate(splits):	# for every split, save a splitKey
+			if idx == 0: 						# If index is zero
+				splitTypes.append("<=" + str(split))	# add just less than or equal
+			else:			# If last element
+				splitTypes.append(str(splits[idx - 1]) + "< x <=" + str(split))	# 
+		splitTypes.append(">" + str(splits[len(splits) - 1]))
+		# UPDATE ATTRIBUTES TO REFELCT CHANGES
 		for attr in self.attributes:
 			if attr[0] == attrName:
 				attr[1] = splitTypes
-		newBin = util.categoricalBin(splitTypes)
-		for contVar in self.continuousVariables[attrName].getValues():	# for every continuous variable we have
-			if contVar > currentSplit and currentSplit[1] != len(splits) - 1:
+		newBin = util.categoricalBin(splitTypes)	# create a new bin to store our values
+		splitKey = splitTypes[0]
+		for idx, contVar in enumerate(self.continuousVariables[attrName].getValues()):	# for every continuous variable we have
+			if contVar > currentSplit[0] and currentSplit[1] != len(splits) - 1:
 				currentSplit = [splits[currentSplit[1] + 1], currentSplit[1] + 1]
-				splitKey = "<=" + str(currentSplit[0])
+				splitKey = splitTypes[currentSplit[1]]
 			elif contVar > currentSplit:
-				splitKey = ">" + str(currentSplit[0])
-			else:
-				splitKey = "<=" + str(currentSplit[0])
-			
-			if len(data) == 0:
-				rlKey = attrName + " " + str(int(contVar))
-				newrlKey = attrName + " " + splitKey
-				if rlKey in self.lookup:
-					for userId in self.lookup[rlKey]:		# for every user that has that continuous variable value
-						self.data[userId][attrName] = splitKey
-						if newrlKey in self.lookup:
-							self.lookup[newrlKey].append(userId)
-						else:
-							self.lookup[newrlKey] = [userId]
-						newBin.add(splitKey, self.data[userId][settings.CLASSIFIER_NAME])
-					self.lookup.pop(rlKey)
-
-			elif data[len(data)-1][0] != contVar:							# if we have not already allocated the users for this continuous var
-				rlKey = attrName + " " + str(int(contVar))
-				newrlKey = attrName + " " + splitKey
-				for userId in self.lookup[rlKey]:		# for every user that has that continuous variable value
-					self.data[userId][attrName] = splitKey
-					if newrlKey in self.lookup:
-						self.lookup[newrlKey].append(userId)
-					else:
-						self.lookup[newrlKey] = [userId]
-					newBin.add(splitKey)
-				self.lookup.pop(rlKey)
+				splitKey = splitTypes[len(splitTypes) - 1]
+			# UPDATE REVERSE LOOKUP
+			rlKey = attrName + " " + str(float(contVar))
+			if rlKey not in self.lookup:
+				continue
+			newrlKey = attrName + " " + splitKey
+			for userId in self.lookup[rlKey]:		# for every user that has that continuous variable value
+				self.data[userId][attrName] = splitKey
+				if newrlKey in self.lookup:
+					self.lookup[newrlKey].append(userId)
+				else:
+					self.lookup[newrlKey] = [userId]
+				newBin.add(splitKey, self.data[userId][settings.CLASSIFIER_NAME])
+			self.lookup.pop(rlKey)
 		self.continuousVariables.pop(attrName)
 		self.categoricalVariables[attrName] = newBin
 
@@ -122,19 +114,18 @@ class dataBin:
 			# get and store the mean of that attribute
 			if (attrName + " ?") in self.lookup:
 				# reverseLookup the indices of people who are missing values and iterate through them
-				for entry in self.lookup[attrName + " ?"]:
-					mean = self.continuousVariables[attrName].getClassMean(self.data[entry][settings.CLASSIFIER_NAME])
+				for itemId in self.lookup[attrName + " ?"]:
+					mean = self.continuousVariables[attrName].getClassMean(self.data[itemId][settings.CLASSIFIER_NAME])
 					# replace their question mark with the mean
-					self.data[entry][attrName] = mean
+					if self.data[itemId][attrName] == '?':
+						self.data[itemId][attrName] = mean
 					# add to the mean in the continuous variables
-					self.continuousVariables[attrName].add(mean, self.data[entry][settings.CLASSIFIER_NAME])
-				# move indices into proper location ['attr modeName']
-				for filledUserID in self.lookup[attrName + " ?"]:
-					mean = self.continuousVariables[attrName].getClassMean(self.data[filledUserID][settings.CLASSIFIER_NAME])
+					self.continuousVariables[attrName].add(mean, self.data[itemId][settings.CLASSIFIER_NAME])
+					# move indices into proper location ['attr modeName']
 					if attrName + " " + str(mean) in self.lookup:
-						self.lookup[attrName + " " + str(mean)].append(filledUserID)
+						self.lookup[attrName + " " + str(mean)].append(itemId)
 					else:
-						self.lookup[attrName + " " + str(mean)] = [filledUserID]
+						self.lookup[attrName + " " + str(mean)] = [itemId]
 				self.lookup.pop(attrName + " ?", 0) 		# remove from reverse lookup
 			else:
 				print "No missing values for " + attrName
@@ -152,10 +143,10 @@ class dataBin:
 		# create supplementary data structure to store relevant data as tuples [attr, classifier]
 		for contVar in self.continuousVariables[attrName].getValues():	# for every continuous variable we have
 			if len(data) == 0:
-				for userId in self.lookup[attrName + " " + str(int(contVar))]:		# for every user that has that continuous variable value
+				for userId in self.lookup[attrName + " " + str(contVar)]:		# for every user that has that continuous variable value
 					data.append((contVar, self.data[userId][settings.CLASSIFIER_NAME]))
 			elif data[len(data)-1][0] != contVar:							# if we have not already allocated the users for this continuous var
-				for userId in self.lookup[attrName + " " + str(int(contVar))]:		# for every user that has that continuous variable value
+				for userId in self.lookup[attrName + " " + str(contVar)]:		# for every user that has that continuous variable value
 					data.append((contVar, self.data[userId][settings.CLASSIFIER_NAME]))
 		# Use a closure scoped function to do the heavy lifting, assume items in bin(list) are tuples
 		def findMaxEntropySplit(bin):

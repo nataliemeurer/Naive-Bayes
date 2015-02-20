@@ -13,9 +13,6 @@ fullData = processor.dataBin(data)
 fullData.fillAllMissingValues()
 fullData.discretizeAllContinuousVariables()
 bayesianClassifier = nb.NaiveBayes(fullData.getData(), fullData.attributes)
-count = 45
 for item in fullData.getData():
-	for entry in item:
-		if util.isNumber(item[entry]) and entry != "fnlwgt:":
-			print entry
-			print item[entry]
+	print bayesianClassifier.classify(item)
+	

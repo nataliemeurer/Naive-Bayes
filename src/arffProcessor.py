@@ -46,14 +46,14 @@ def readArff(fileSrc):
 			newDataEntry = {}							# create a new object to store our row data
 			for idx, value in enumerate(line):			# for every column of data
 				attribute = attributes[idx]
+				if util.isNumber(value):						# convert string to float if it's a number
+					value = float(value)
 				# Add value to our reverse lookup under the key "attributeName attributeValue"
-				rlKey = attribute[0] + " " + value 		# create key for our reverseLookup data structure
+				rlKey = attribute[0] + " " + str(value) 		# create key for our reverseLookup data structure
 				if rlKey in reverseLookup:
 					reverseLookup[rlKey].append(len(rawData)) # append index of our current row (the length of data) for quick lookup later
 				else:
 					reverseLookup[rlKey] = [len(rawData)]	# create a new arrayList to store our indices if one does not already exist
-				if util.isNumber(value):						# convert string to float if it's a number
-					value = float(value)
 				# fill our newData Entry
 				newDataEntry[attribute[0]] = value 		# store the value under its proper key
 				# add variables to our bins
