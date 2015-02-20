@@ -1,6 +1,8 @@
 #  STORES ACCESSORY CLASSES AND FUNCTIONS
 import bisect
 import time, sys
+import numpy as np
+import math
 
 # Class used to manage sorted sets of a continuous variable
 class continuousBin:
@@ -79,6 +81,10 @@ class categoricalBin:
 	def getClassMode(self, className):
 		return self.classModes[className][1]
 
+
+def gaussianDensity(val, mean, stdev):
+	density = ((1 / np.sqrt(2.0 * 3.14159 * stdev))) * math.exp(np.power(val - mean, 2) / (2 * np.power(stdev, 2)))
+	return density
 
 # Returns whether the string can be converted to a number
 def isNumber(str):
