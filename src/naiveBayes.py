@@ -43,6 +43,15 @@ class NaiveBayes:
 		for key in initialKeys:
 			self.numericBins[key + " mean"] = np.mean(self.numericBins[key])	# store mean of each prob
 			self.numericBins[key + " stdev"] = np.std(self.numericBins[key])	# store std deviation of each continuous var
+		for attr in attributes:									# if we have not stored values for certain attributes, we do so now, using smoothing techniques
+			if attr[1] != 'real':
+				for attrType in attr[1]:
+					if attrType not in self.probability:
+						self.probability[attrType] = .5 / numOfEntries
+						for name in self.classifierBins:
+							self.probability[attrType + " given " + name] = .5 / len(self.classifierBins[name])
+
+
 
 		# ASSIGN PROBABILITIES
 		print "\n\nAssigning probabilities:"
