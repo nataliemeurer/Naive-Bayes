@@ -12,7 +12,10 @@ import validator as val
 data = arff.readArff(ENV.DATA_SRC)
 fullData = processor.dataBin(data)
 fullData.fillAllMissingValues()
-fullData.discretizeAllContinuousVariables()
-# bayesianClassifier = nb.NaiveBayes(fullData.getData(), fullData.attributes)
+if ENV.DISCRETIZE_ALL_ATTRIBUTES == True:
+	fullData.discretizeAllContinuousVariables()
+else:
+	for attr in ENV.DISCRETIZED_ATTRIBUTES:
+		fullData.discretizeContinuousVariable(attr, ENV.NUM_OF_BINS)
 val.validateNB(fullData.getData(), fullData.attributes, 10)
 	

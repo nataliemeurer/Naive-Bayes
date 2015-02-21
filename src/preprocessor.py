@@ -19,6 +19,16 @@ class dataBin:
 	def getData(self):
 		return self.data
 
+	def discretizeContinuousVariable(self, attrName, numOfBins=5):
+		splits = self.entropyDiscretize(attrName, numOfBins)
+		if len(splits) > 0:
+			print "Splitting " + attrName + " at the following values:"
+			print splits
+			print "\n"
+			self.convertContinuousToCategorical(attrName, splits)
+		else:
+			print "Not enough entropy gain to split " + attrName + "\n"
+
 	# Discretize all continuous variables
 	def discretizeAllContinuousVariables(self):
 		print "Discretizing all continuous variables"
