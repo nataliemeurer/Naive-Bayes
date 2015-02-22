@@ -83,11 +83,11 @@ class categoricalBin:
 
 
 def gaussianDensity(val, mean, stdev):
-	# try:
-	density = ((1 / np.sqrt(2.0 * 3.14159 * stdev))) * np.exp(np.power(val - mean, 2) / (2 * np.power(stdev, 2)))
-	return density
-	# except OverflowError:
-	# 	return .1
+	try:
+		density = ((1 / np.sqrt(2.0 * 3.14159 * stdev))) * np.exp(np.power(val - mean, 2) / (2 * np.power(stdev, 2)))
+		return density
+	except OverflowError:
+		return .1
 
 # Returns whether the string can be converted to a number
 def isNumber(str):

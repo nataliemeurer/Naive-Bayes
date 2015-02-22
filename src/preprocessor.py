@@ -31,7 +31,7 @@ class dataBin:
 
 	# Discretize all continuous variables
 	def discretizeAllContinuousVariables(self):
-		print "Discretizing all continuous variables"
+		print "\nDISCRETIZING ALL CONTINUOUS VARIABLES"
 		continuousVars = self.continuousVariables.keys()
 		for idx, attrName in enumerate(continuousVars):
 			print "Discretizing data for " + attrName

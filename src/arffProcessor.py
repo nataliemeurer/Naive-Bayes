@@ -14,10 +14,12 @@ def readArff(fileSrc):
 	dataFile = codecs.open(fileSrc, 'rb', 'utf-8') 	# specify utf-8 encoding
 	print "Reading file..."
 	lines = dataFile.readlines() 					# read all lines
-	util.updateProgress(0)					# create a progress bar
+	if settings.PROGRESS_BAR == True:
+		util.updateProgress(0)					# create a progress bar
 	# test every line and extract its relevant information
 	for idx, line in enumerate(lines):				# test each line
-		util.updateProgress(float(idx) / float(len(lines)))
+		if settings.PROGRESS_BAR == True:
+			util.updateProgress(float(idx) / float(len(lines)))
 		if line[0] == '%':							# ignore comments
 			continue
 		elif line[0] == '@':						# if is metadata
@@ -78,6 +80,7 @@ def readArff(fileSrc):
 	results['lookup'] = reverseLookup
 	results['continuousVariables'] = continuousVariables
 	results['categoricalVariables'] = categoricalVariables
-	util.updateProgress(1)
+	if settings.PROGRESS_BAR == True:
+		util.updateProgress(1)
 	print "\nFile read complete \n"
 	return results

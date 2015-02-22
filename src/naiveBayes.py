@@ -10,7 +10,8 @@ class NaiveBayes:
 		print "Training Bayesian Classifier with " + str(len(trainingData)) + " data entries.\n"
 		# COUNT VARIABLES
 		print "Counting all variables:"
-		util.updateProgress(0)
+		if settings.PROGRESS_BAR == True:
+			util.updateProgress(0)
 		# Sort the training data into two bins based on classifier, meanwhile recording the counts for each variable
 		numOfEntries = float(len(trainingData))
 		categoricalCounts = {}		# Holds counts of each category
@@ -20,7 +21,8 @@ class NaiveBayes:
 		count = 0.0
 		for entry in trainingData:	# for every data row...
 			count += 1.0
-			util.updateProgress(count / (numOfEntries))
+			if settings.PROGRESS_BAR == True:
+				util.updateProgress(count / (numOfEntries))
 			for attr in entry:		# for each attribute...
 				if util.isNumber(entry[attr]) == False:			# for categorical attributes
 					if entry[attr] in categoricalCounts:		# if we have already created a key for this
@@ -56,14 +58,16 @@ class NaiveBayes:
 		# ASSIGN PROBABILITIES
 		print "\n\nAssigning probabilities:"
 		# Now we have two bins, each holding our different classifiers and counts of all our variables
-		util.updateProgress(0)
+		if settings.PROGRESS_BAR == True:
+			util.updateProgress(0)
 		for key in categoricalCounts.keys(): 							# Assign categorical counts
 			self.probability[key] = self.getProbability(categoricalCounts[key], numOfEntries)
 		attrs = categoricalCounts.keys()			# get the attrs we will iterate through
 		count = 0.0									# create a count used to log to the status bar
 		for key in self.classifierBins.keys():		# for each classifier type...
 			count += 1
-			util.updateProgress(count / float(len(self.classifierBins.keys()))) # update progress bar
+			if settings.PROGRESS_BAR == True:
+				util.updateProgress(count / float(len(self.classifierBins.keys()))) # update progress bar
 			
 			for row in self.classifierBins[key]:			# for each row in the classifierBins...
 				for rowKey in row:							# for each key in the row...
@@ -79,7 +83,8 @@ class NaiveBayes:
 					self.probability[countKey] = self.getProbability(categoricalCounts[countKey], len(self.classifierBins[key])) 	# Assign conditional probabilities
 				else:
 					self.probability[countKey] = self.getProbability(0, len(self.classifierBins[key]))
-		util.updateProgress(1)
+		if settings.PROGRESS_BAR == True:
+			util.updateProgress(1)
 		print "\nModel creation complete\n"
 
 	def classify(self, data):
