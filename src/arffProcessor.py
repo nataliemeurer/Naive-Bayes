@@ -1,6 +1,7 @@
 import codecs
 import re
 import utils as util
+import settings
 
 # readArff( fileSrc ): takes a file path for an arff and returns a list of dictionaries as well as a d
 def readArff(fileSrc):

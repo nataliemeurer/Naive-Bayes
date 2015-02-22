@@ -67,6 +67,7 @@ def validateNB(data, attributes, numOfFolds):
 			recalls.append(thisRecall)
 			f1s.append(f1(thisRecall, thisPrecision))
 		newRow =[foldCount]
+		
 		microPrec = microPrecision(truePositives, falsePositives)
 		analytics["Micro Precision"].append(microPrec)
 		newRow.append(microPrec)
@@ -74,7 +75,7 @@ def validateNB(data, attributes, numOfFolds):
 		microRec = microRecall(truePositives, falseNegatives)
 		analytics["Micro Recall"].append(microRec)
 		newRow.append(microRec)
-		
+
 		microF1 = f1(microRec, microPrec)
 		analytics["Micro F1"].append(microF1)
 		newRow.append(microF1)
@@ -124,9 +125,9 @@ def microRecall(truePositives, falseNegs):
 	truePosSum = float(sum(truePositives))
 	return truePosSum / float(truePosSum + sum(falseNegs))
 
-def microPrecision(truePositives, trueNegs):
+def microPrecision(truePositives, falsePositives):
 	truePosSum = float(sum(truePositives))
-	return truePosSum / float(truePosSum + sum(trueNegs))
+	return truePosSum / float(truePosSum + sum(falsePositives))
 
 def macroCalculate(vals):
 	return float(sum(vals)) / float(len(vals))
