@@ -1,0 +1,235 @@
+Reading file...
+
+File read complete 
+
+Filling all missing values with mean(continuous) or mode(categorical)
+Filled missing values for workclass
+Filled missing values for occupation:
+Filled missing values for native-country:
+
+DISCRETIZING ALL CONTINUOUS VARIABLES
+Discretizing data for hours-per-week:
+Splitting hours-per-week: at the following values:
+[34.5, 39.5, 41.5, 49.5, 61.5]
+
+
+Discretizing data for age
+Splitting age at the following values:
+[23.5, 27.5, 30.5, 35.5, 61.5]
+
+
+Discretizing data for education-num:
+Splitting education-num: at the following values:
+[8.5, 10.5, 12.5, 13.5, 14.5]
+
+
+Discretizing data for capital-loss:
+Splitting capital-loss: at the following values:
+[1568.5, 1820.5, 1881.5, 1978.5, 2364.5]
+
+
+Discretizing data for fnlwgt:
+Not enough entropy gain to split fnlwgt:
+
+Discretizing data for capital-gain:
+Splitting capital-gain: at the following values:
+[4243.5, 5119.0, 6457.5, 6563.0, 7055.5]
+
+
+
+BEGINNING VALIDATION
+
+Creating Model Number 1
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.825143325143
+Micro Recall: 0.825143325143
+Micro F1: 0.825143325143
+Macro Precision: 0.766061942526
+Macro Recall: 0.811150464888
+Macro F1: 0.782035749403
+Accuracy: 0.825143325143
+
+Creating Model Number 2
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.823505323505
+Micro Recall: 0.823505323505
+Micro F1: 0.823505323505
+Macro Precision: 0.759872488826
+Macro Recall: 0.812684624393
+Macro F1: 0.777543168168
+Accuracy: 0.823505323505
+
+Creating Model Number 3
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.818796068796
+Micro Recall: 0.818796068796
+Micro F1: 0.818796068796
+Macro Precision: 0.758997837157
+Macro Recall: 0.809854764917
+Macro F1: 0.775690953225
+Accuracy: 0.818796068796
+
+Creating Model Number 4
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.830671580672
+Micro Recall: 0.830671580672
+Micro F1: 0.830671580672
+Macro Precision: 0.770822031052
+Macro Recall: 0.818637249631
+Macro F1: 0.787715197533
+Accuracy: 0.830671580672
+
+Creating Model Number 5
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.831081081081
+Micro Recall: 0.831081081081
+Micro F1: 0.831081081081
+Macro Precision: 0.7730813323
+Macro Recall: 0.816844258006
+Macro F1: 0.789005375014
+Accuracy: 0.831081081081
+
+Creating Model Number 6
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.823914823915
+Micro Recall: 0.823914823915
+Micro F1: 0.823914823915
+Macro Precision: 0.765397901424
+Macro Recall: 0.813716216216
+Macro F1: 0.781881857346
+Accuracy: 0.823914823915
+
+Creating Model Number 7
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.825348075348
+Micro Recall: 0.825348075348
+Micro F1: 0.825348075348
+Macro Precision: 0.76955214673
+Macro Recall: 0.818884829828
+Macro F1: 0.786057962779
+Accuracy: 0.825348075348
+
+Creating Model Number 8
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.84009009009
+Micro Recall: 0.84009009009
+Micro F1: 0.84009009009
+Macro Precision: 0.7780393944
+Macro Recall: 0.828459319701
+Macro F1: 0.796175592534
+Accuracy: 0.84009009009
+
+Creating Model Number 9
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.821662571663
+Micro Recall: 0.821662571663
+Micro F1: 0.821662571663
+Macro Precision: 0.758876990805
+Macro Recall: 0.810884533824
+Macro F1: 0.776213809682
+Accuracy: 0.821662571663
+
+Creating Model Number 10
+Training Bayesian Classifier with 43958 data entries.
+
+Counting all variables:
+
+
+Assigning probabilities:
+
+Model creation complete
+
+Micro Precision: 0.825757575758
+Micro Recall: 0.825757575758
+Micro F1: 0.825757575758
+Macro Precision: 0.765275458904
+Macro Recall: 0.815899187595
+Macro F1: 0.782455183517
+Accuracy: 0.825757575758
+
+FINAL RESULTS
+Model Number      Micro Precision    Micro Recall    Micro F1    Macro Precision    Macro Recall    Macro F1    Accuracy
+--------------  -----------------  --------------  ----------  -----------------  --------------  ----------  ----------
+1                        0.825143        0.825143    0.825143           0.766062        0.81115     0.782036    0.825143
+2                        0.823505        0.823505    0.823505           0.759872        0.812685    0.777543    0.823505
+3                        0.818796        0.818796    0.818796           0.758998        0.809855    0.775691    0.818796
+4                        0.830672        0.830672    0.830672           0.770822        0.818637    0.787715    0.830672
+5                        0.831081        0.831081    0.831081           0.773081        0.816844    0.789005    0.831081
+6                        0.823915        0.823915    0.823915           0.765398        0.813716    0.781882    0.823915
+7                        0.825348        0.825348    0.825348           0.769552        0.818885    0.786058    0.825348
+8                        0.84009         0.84009     0.84009            0.778039        0.828459    0.796176    0.84009
+9                        0.821663        0.821663    0.821663           0.758877        0.810885    0.776214    0.821663
+10                       0.825758        0.825758    0.825758           0.765275        0.815899    0.782455    0.825758
+Average                  0.826597        0.826597    0.826597           0.766598        0.815702    0.783477    0.826597

@@ -1,7 +1,7 @@
 # USED TO STORE GLOBAL / ENVIRONMENTAL VARIABLES
 
 # General Settings
-PROGRESS_BAR = True 							# set whether a progress bar is used to show output.  Should be turned off when writing to files
+PROGRESS_BAR = False 							# set whether a progress bar is used to show output.  Should be turned off when writing to files
 
 # File src, relative to main
 DATA_SRC = './data/adult-big.arff'
