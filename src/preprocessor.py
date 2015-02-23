@@ -250,11 +250,26 @@ class dataBin:
 		bin1Entropy = self.calculateEntropy(float(count1a) / binSize1) + self.calculateEntropy(float(count1b) / binSize1)
 		bin2Entropy = self.calculateEntropy(float(count2a) / binSize2) + self.calculateEntropy(float(count2b) / binSize2)
 		entropyGain = initialEntropy - (binSize1 / totalSize)*( bin1Entropy ) - (binSize2 / totalSize)*( bin2Entropy )
-		if settings.MINIMUM_DESCRIPTION_LENGTH_VALIDATION == True:
+		# Depending upon which forms of validation are active, we return different things
+		# If both are active
+		if settings.MINIMUM_DESCRIPTION_LENGTH_VALIDATION == True and settings.STATIC_GAIN_CUTOFF[0] == True:
+			if entropyGain > settings.STATIC_GAIN_CUTOFF[1] and self.validateEntropyGain(entropyGain, totalSize, 2, classCountGroup1, classCountGroup2, initialEntropy, bin1Entropy, bin2Entropy):
+				return entropyGain
+			else:
+				return 0
+		# If one is active
+		elif settings.MINIMUM_DESCRIPTION_LENGTH_VALIDATION == True:
 			if self.validateEntropyGain(entropyGain, totalSize, 2, classCountGroup1, classCountGroup2, initialEntropy, bin1Entropy, bin2Entropy):
 				return entropyGain
 			else:
 				return 0
+		# If the other is active
+		elif settings.STATIC_GAIN_CUTOFF[0] == True:
+			if entropyGain > settings.STATIC_GAIN_CUTOFF[1]:
+				return entropyGain
+			else:
+				return 0
+		# If none are active
 		else:
 			return entropyGain
 

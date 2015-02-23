@@ -42,6 +42,7 @@ def validateNB(data, attributes, numOfFolds):
 			classifiedAnswer = testClassifier.classify(row)
 			if rightAnswer == classifiedAnswer:	# if it is an accurate prediction, we have a true positive / true negative
 				totalCounts[rightAnswer + "tp"] += 1
+				# a true positive for one class is a true negative for the other
 				for name in classNames:
 					if name != rightAnswer:
 						totalCounts[name + "tn"] += 1
